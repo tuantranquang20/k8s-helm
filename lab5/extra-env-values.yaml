@@ -1,0 +1,9 @@
+extraEnvVars:
+  - name: API_KEY
+    value: "abc123xyz"
+  - name: DEBUG_MODE
+    value: "true"
+  - name: MAX_CONNECTIONS
+    value: "100"
+  - name: CACHE_TTL
+    value: "3600"
