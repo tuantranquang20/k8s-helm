@@ -1,0 +1,61 @@
+# Catalog Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: catalog
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: catalog
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecommerce
+      component: catalog
+  template:
+    metadata:
+      labels:
+        app: ecommerce
+        component: catalog
+    spec:
+      containers:
+      - name: catalog
+        image: nginx:latest
+        ports:
+        - containerPort: 8001
+        env:
+        - name: SERVICE_NAME
+          value: "catalog-service"
+        - name: PORT
+          value: "8001"
+        - name: DATABASE_URL
+          value: "postgresql://ecommerce:ecommerce-password@postgresql:5432/ecommerce"
+        - name: REDIS_URL
+          value: "redis://redis:6379"
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+---
+# Catalog Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: catalog
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: catalog
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8001
+    targetPort: 8001
+    name: http
+  selector:
+    app: ecommerce
+    component: catalog

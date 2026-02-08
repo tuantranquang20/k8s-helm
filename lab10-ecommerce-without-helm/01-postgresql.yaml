@@ -1,0 +1,97 @@
+# PostgreSQL Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secret
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+type: Opaque
+data:
+  postgres-password: ZWNvbW1lcmNl  # ecommerce
+  username: ZWNvbW1lcmNl  # ecommerce
+  password: ZWNvbW1lcmNlLXBhc3N3b3Jk  # ecommerce-password
+---
+# PostgreSQL PVC
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: ecommerce
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+# PostgreSQL Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgresql
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecommerce
+      component: database
+  template:
+    metadata:
+      labels:
+        app: ecommerce
+        component: database
+    spec:
+      containers:
+      - name: postgresql
+        image: postgres:14
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: "ecommerce"
+        - name: POSTGRES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: password
+        - name: POSTGRES_DB
+          value: "ecommerce"
+        resources:
+          limits:
+            cpu: 1000m
+            memory: 1Gi
+          requests:
+            cpu: 500m
+            memory: 512Mi
+        volumeMounts:
+        - name: postgres-storage
+          mountPath: /var/lib/postgresql/data
+          subPath: postgres
+      volumes:
+      - name: postgres-storage
+        persistentVolumeClaim:
+          claimName: postgres-pvc
+---
+# PostgreSQL Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: database
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    name: postgresql
+  selector:
+    app: ecommerce
+    component: database

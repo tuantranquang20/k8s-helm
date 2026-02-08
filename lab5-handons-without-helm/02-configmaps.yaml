@@ -1,0 +1,53 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: lab5-app
+  labels:
+    app: advanced-app
+data:
+  app-name: "my-app"
+  environment: "development"
+  log-level: "info"
+  
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: extra-env-config
+  namespace: lab5-app
+  labels:
+    app: advanced-app
+data:
+  API_KEY: "abc123xyz"
+  DEBUG: "true"
+  MAX_CONNECTIONS: "100"
+  TIMEOUT: "30"
+  
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: functions-demo
+  namespace: lab5-app
+  labels:
+    app: advanced-app
+data:
+  app-name-upper: "MY-APP"
+  app-name-lower: "my-app"
+  app-name-title: "My-App"
+  default-value: "development"
+  tags-joined: "kubernetes,docker,helm,devops"
+  port-string: "8080"
+  
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: connection-config
+  namespace: lab5-app
+  labels:
+    app: advanced-app
+data:
+  database-url: "postgresql://myuser:mypassword@mydb-postgresql:5432/appdb"
+  redis-url: "redis://localhost:6379/0"

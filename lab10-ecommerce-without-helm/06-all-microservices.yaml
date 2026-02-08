@@ -1,0 +1,241 @@
+# Shopping Cart Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cart
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: cart
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecommerce
+      component: cart
+  template:
+    metadata:
+      labels:
+        app: ecommerce
+        component: cart
+    spec:
+      containers:
+      - name: cart
+        image: nginx:latest
+        ports:
+        - containerPort: 8002
+        env:
+        - name: SERVICE_NAME
+          value: "cart-service"
+        - name: PORT
+          value: "8002"
+        - name: DATABASE_URL
+          value: "postgresql://ecommerce:ecommerce-password@postgresql:5432/ecommerce"
+        - name: REDIS_URL
+          value: "redis://redis:6379"
+        resources:
+          limits:
+            cpu: 300m
+            memory: 384Mi
+          requests:
+            cpu: 150m
+            memory: 192Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cart
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: cart
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8002
+    targetPort: 8002
+    name: http
+  selector:
+    app: ecommerce
+    component: cart
+---
+# Order Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: order
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecommerce
+      component: order
+  template:
+    metadata:
+      labels:
+        app: ecommerce
+        component: order
+    spec:
+      containers:
+      - name: order
+        image: nginx:latest
+        ports:
+        - containerPort: 8003
+        env:
+        - name: SERVICE_NAME
+          value: "order-service"
+        - name: PORT
+          value: "8003"
+        - name: DATABASE_URL
+          value: "postgresql://ecommerce:ecommerce-password@postgresql:5432/ecommerce"
+        - name: RABBITMQ_URL
+          value: "amqp://admin:admin123@rabbitmq:5672"
+        resources:
+          limits:
+            cpu: 400m
+            memory: 512Mi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: order
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8003
+    targetPort: 8003
+    name: http
+  selector:
+    app: ecommerce
+    component: order
+---
+# Payment Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: payment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecommerce
+      component: payment
+  template:
+    metadata:
+      labels:
+        app: ecommerce
+        component: payment
+    spec:
+      containers:
+      - name: payment
+        image: nginx:latest
+        ports:
+        - containerPort: 8004
+        env:
+        - name: SERVICE_NAME
+          value: "payment-service"
+        - name: PORT
+          value: "8004"
+        - name: DATABASE_URL
+          value: "postgresql://ecommerce:ecommerce-password@postgresql:5432/ecommerce"
+        resources:
+          limits:
+            cpu: 300m
+            memory: 256Mi
+          requests:
+            cpu: 150m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: payment
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8004
+    targetPort: 8004
+    name: http
+  selector:
+    app: ecommerce
+    component: payment
+---
+# User Service
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: user
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecommerce
+      component: user
+  template:
+    metadata:
+      labels:
+        app: ecommerce
+        component: user
+    spec:
+      containers:
+      - name: user
+        image: nginx:latest
+        ports:
+        - containerPort: 8005
+        env:
+        - name: SERVICE_NAME
+          value: "user-service"
+        - name: PORT
+          value: "8005"
+        - name: DATABASE_URL
+          value: "postgresql://ecommerce:ecommerce-password@postgresql:5432/ecommerce"
+        - name: REDIS_URL
+          value: "redis://redis:6379"
+        resources:
+          limits:
+            cpu: 300m
+            memory: 384Mi
+          requests:
+            cpu: 150m
+            memory: 192Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: user
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8005
+    targetPort: 8005
+    name: http
+  selector:
+    app: ecommerce
+    component: user

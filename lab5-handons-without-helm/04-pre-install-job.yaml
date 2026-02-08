@@ -1,0 +1,28 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: pre-install-hook
+  namespace: lab5-app
+  labels:
+    app: advanced-app
+    hook: pre-install
+spec:
+  template:
+    metadata:
+      name: pre-install
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: pre-install
+        image: busybox
+        command:
+          - sh
+          - -c
+          - |
+            echo "===================================="
+            echo "Running pre-install checks"
+            echo "Checking prerequisites..."
+            echo "Environment: development"
+            echo "===================================="
+            sleep 5
+            echo "Pre-install checks completed!"

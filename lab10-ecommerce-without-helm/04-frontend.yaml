@@ -1,0 +1,63 @@
+# Frontend Storefront Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ecommerce
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: ecommerce
+        component: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: CATALOG_SERVICE_URL
+          value: "http://catalog:8001"
+        - name: CART_SERVICE_URL
+          value: "http://cart:8002"
+        - name: ORDER_SERVICE_URL
+          value: "http://order:8003"
+        - name: USER_SERVICE_URL
+          value: "http://user:8005"
+        - name: PAYMENT_SERVICE_URL
+          value: "http://payment:8004"
+        resources:
+          limits:
+            cpu: 300m
+            memory: 256Mi
+          requests:
+            cpu: 150m
+            memory: 128Mi
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    name: http
+  selector:
+    app: ecommerce
+    component: frontend

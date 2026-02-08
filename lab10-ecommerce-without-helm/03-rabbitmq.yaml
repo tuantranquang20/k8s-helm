@@ -1,0 +1,76 @@
+# RabbitMQ Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rabbitmq-secret
+  namespace: ecommerce
+type: Opaque
+data:
+  rabbitmq-password: YWRtaW4xMjM=  # admin123
+---
+# RabbitMQ Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rabbitmq
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: rabbitmq
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ecommerce
+      component: rabbitmq
+  template:
+    metadata:
+      labels:
+        app: ecommerce
+        component: rabbitmq
+    spec:
+      containers:
+      - name: rabbitmq
+        image: rabbitmq:3.11-management
+        ports:
+        - containerPort: 5672
+          name: amqp
+        - containerPort: 15672
+          name: management
+        env:
+        - name: RABBITMQ_DEFAULT_USER
+          value: "admin"
+        - name: RABBITMQ_DEFAULT_PASS
+          valueFrom:
+            secretKeyRef:
+              name: rabbitmq-secret
+              key: rabbitmq-password
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+---
+# RabbitMQ Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabbitmq
+  namespace: ecommerce
+  labels:
+    app: ecommerce
+    component: rabbitmq
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5672
+    targetPort: amqp
+    name: amqp
+  - port: 15672
+    targetPort: management
+    name: management
+  selector:
+    app: ecommerce
+    component: rabbitmq

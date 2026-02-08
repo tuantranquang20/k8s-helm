@@ -1,0 +1,73 @@
+# Secret for database credentials
+apiVersion: v1
+kind: Secret
+metadata:
+  name: db-secret
+  namespace: fullstack-app
+  labels:
+    app: fullstack-app
+type: Opaque
+data:
+  # postgresql://appuser:changeme123@postgresql:5432/appdb
+  database-url: cG9zdGdyZXNxbDovL2FwcHVzZXI6Y2hhbmdlbWUxMjNAcG9zdGdyZXNxbDo1NDMyL2FwcGRi
+  username: YXBwdXNlcg==
+  password: Y2hhbmdlbWUxMjM=
+---
+# Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: fullstack-app
+  labels:
+    app: fullstack-app
+    component: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: fullstack-app
+      component: frontend
+  template:
+    metadata:
+      labels:
+        app: fullstack-app
+        component: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: nginx:1.22
+        ports:
+        - containerPort: 80
+        env:
+        - name: BACKEND_API_URL
+          value: "http://backend:8080"
+        - name: APP_NAME
+          value: "fullstack-app"
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 50m
+            memory: 64Mi
+---
+# Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend
+  namespace: fullstack-app
+  labels:
+    app: fullstack-app
+    component: frontend
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: fullstack-app
+    component: frontend

@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: advanced-app
+  namespace: lab5-app
+  labels:
+    app: advanced-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: advanced-app
+  template:
+    metadata:
+      labels:
+        app: advanced-app
+    spec:
+      containers:
+      - name: app
+        image: nginx:1.21
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        # From ConfigMap
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: app-name
+        - name: ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: environment
+        - name: LOG_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: log-level
+        # From extra-env ConfigMap
+        - name: API_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: extra-env-config
+              key: API_KEY
+        - name: DEBUG
+          valueFrom:
+            configMapKeyRef:
+              name: extra-env-config
+              key: DEBUG
+        # From Secret
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: app-database-secret
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-database-secret
+              key: password
+        - name: DATABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: connection-config
+              key: database-url
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: advanced-app
+  namespace: lab5-app
+  labels:
+    app: advanced-app
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: advanced-app

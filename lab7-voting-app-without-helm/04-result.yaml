@@ -1,0 +1,65 @@
+# Result Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: result
+  namespace: voting-app
+  labels:
+    app: voting-app
+    component: result
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voting-app
+      component: result
+  template:
+    metadata:
+      labels:
+        app: voting-app
+        component: result
+    spec:
+      containers:
+      - name: result
+        image: dockersamples/examplevotingapp_result:latest
+        ports:
+        - containerPort: 80
+          name: http
+        env:
+        - name: POSTGRES_HOST
+          value: "postgresql"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "postgres"
+        resources:
+          limits:
+            cpu: 200m
+            memory: 256Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+---
+# Result Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: result
+  namespace: voting-app
+  labels:
+    app: voting-app
+    component: result
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    app: voting-app
+    component: result

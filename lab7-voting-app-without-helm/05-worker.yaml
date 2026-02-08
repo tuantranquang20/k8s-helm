@@ -1,0 +1,46 @@
+# Worker Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  namespace: voting-app
+  labels:
+    app: voting-app
+    component: worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: voting-app
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: voting-app
+        component: worker
+    spec:
+      containers:
+      - name: worker
+        image: dockersamples/examplevotingapp_worker:latest
+        env:
+        - name: REDIS_HOST
+          value: "redis"
+        - name: REDIS_PORT
+          value: "6379"
+        - name: POSTGRES_HOST
+          value: "postgresql"
+        - name: POSTGRES_PORT
+          value: "5432"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "postgres"
+        resources:
+          limits:
+            cpu: 200m
+            memory: 512Mi
+          requests:
+            cpu: 100m
+            memory: 256Mi
