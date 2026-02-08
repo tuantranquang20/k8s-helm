@@ -1,0 +1,26 @@
+apiVersion: v2
+name: lab6-handons
+description: Bonus Lab 6 - Full-Stack Application with Microservices
+type: application
+version: 1.0.0
+appVersion: "1.0"
+
+keywords:
+  - fullstack
+  - microservices
+  - lab6
+  - bonus
+
+maintainers:
+  - name: K8s Lab Student
+    email: student@k8s-lab.local
+
+dependencies:
+  - name: postgresql
+    version: "12.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: postgresql.enabled
+  - name: redis
+    version: "17.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled

@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "lab5-handons.fullname" . }}-post-install
+  labels:
+    {{- include "lab5-handons.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    metadata:
+      name: {{ include "lab5-handons.fullname" . }}-post-install
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: post-install
+        image: busybox
+        command:
+          - sh
+          - -c
+          - |
+            echo "===================================="
+            echo "Running post-install hook"
+            echo "Performing post-deployment tasks..."
+            echo "Application: {{ .Values.app.name }}"
+            echo "===================================="
+            sleep 5
+            echo "Post-install tasks completed!"

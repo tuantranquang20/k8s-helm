@@ -1,0 +1,30 @@
+{{- if .Values.functionsDemo.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "lab5-handons.fullname" . }}-functions-demo
+  labels:
+    {{- include "lab5-handons.labels" . | nindent 4 }}
+    # String manipulation functions
+    app-upper: {{ .Values.app.name | upper | quote }}
+    app-lower: {{ .Values.app.name | lower | quote }}
+    app-title: {{ .Values.app.name | title | quote }}
+    # Default value function
+    log-level: {{ .Values.app.logLevel | default "info" | quote }}
+    # Replace function
+    env-cleaned: {{ .Values.app.environment | replace "dev" "development" | quote }}
+data:
+  # Trim whitespace
+  trimmed: {{ "  some text with spaces  " | trim | quote }}
+  
+  # Join list
+  {{- if .Values.tags }}
+  tags: {{ .Values.tags | join "," | quote }}
+  {{- end }}
+  
+  # Number to string
+  max-replicas: {{ .Values.replicaCount | toString | quote }}
+  
+  # Conditional with default
+  cache-enabled: {{ .Values.cache.enabled | default false | quote }}
+{{- end }}

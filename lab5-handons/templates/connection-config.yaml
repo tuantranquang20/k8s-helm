@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "lab5-handons.fullname" . }}-connections
+  labels:
+    {{- include "lab5-handons.labels" . | nindent 4 }}
+data:
+  database-url: {{ include "lab5-handons.databaseURL" . | quote }}
+  redis-url: {{ include "lab5-handons.redisURL" . | quote }}
+  environment: {{ .Values.app.environment | quote }}

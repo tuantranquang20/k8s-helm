@@ -1,0 +1,58 @@
+{{- if .Values.catalog.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce-platform.fullname" . }}-catalog
+  labels:
+    {{- include "ecommerce-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: catalog
+spec:
+  replicas: {{ .Values.catalog.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ecommerce-platform.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: catalog
+  template:
+    metadata:
+      labels:
+        {{- include "ecommerce-platform.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: catalog
+    spec:
+      containers:
+      - name: catalog
+        image: "{{ .Values.catalog.image.repository }}:{{ .Values.catalog.image.tag }}"
+        imagePullPolicy: {{ .Values.catalog.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ .Values.catalog.service.port }}
+          protocol: TCP
+        env:
+        {{- range .Values.catalog.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+        - name: DATABASE_URL
+          value: "postgresql://{{ .Values.postgresql.auth.username }}:{{ .Values.postgresql.auth.password }}@{{ .Release.Name }}-postgresql:5432/{{ .Values.postgresql.auth.database }}"
+        - name: REDIS_URL
+          value: "redis://{{ .Release.Name }}-redis-master:6379"
+        resources:
+          {{- toYaml .Values.catalog.resources | nindent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce-platform.fullname" . }}-catalog
+  labels:
+    {{- include "ecommerce-platform.labels" . | nindent 4 }}
+    app.kubernetes.io/component: catalog
+spec:
+  type: {{ .Values.catalog.service.type }}
+  ports:
+  - port: {{ .Values.catalog.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "ecommerce-platform.selectorLabels" . | nindent 4 }}
+    app.kubernetes.io/component: catalog
+{{- end }}

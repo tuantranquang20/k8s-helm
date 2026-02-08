@@ -1,0 +1,112 @@
+# WordPress Stack Configuration
+
+# WordPress Configuration
+wordpress:
+  enabled: true
+  wordpressUsername: admin
+  wordpressPassword: admin123
+  wordpressEmail: admin@example.com
+  wordpressFirstName: Admin
+  wordpressLastName: User
+  wordpressBlogName: "My Kubernetes Blog"
+  
+  # Service Configuration
+  service:
+    type: LoadBalancer
+    port: 80
+  
+  # Persistence
+  persistence:
+    enabled: true
+    storageClass: ""
+    size: 10Gi
+  
+  # Resources
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  
+  # Multi-site support
+  multisite:
+    enabled: false
+  
+  # Auto-update
+  autoUpdateLevel: minor
+  
+  # Plugins to install on first boot
+  plugins: "redis-cache,wordfence,wpforms-lite"
+  
+  # Apache/PHP Configuration
+  extraEnvVars:
+    - name: PHP_MEMORY_LIMIT
+      value: "256M"
+    - name: PHP_MAX_UPLOAD_SIZE
+      value: "64M"
+
+# MySQL Database Configuration
+mysql:
+  enabled: true
+  auth:
+    rootPassword: mysql-root-password
+    database: wordpress
+    username: wordpress
+    password: wordpress-password
+  
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+    resources:
+      limits:
+        cpu: 500m
+        memory: 512Mi
+      requests:
+        cpu: 250m
+        memory: 256Mi
+
+# Redis Cache Configuration
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+    resources:
+      limits:
+        cpu: 200m
+        memory: 256Mi
+      requests:
+        cpu: 100m
+        memory: 128Mi
+
+# Backup Configuration
+backup:
+  enabled: false
+  schedule: "0 2 * * *"  # 2 AM daily
+  retention: 7  # Keep 7 days of backups
+
+# Ingress Configuration
+ingress:
+  enabled: false
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: blog.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: blog-tls
+      hosts:
+        - blog.example.com
+
+# Application Settings
+app:
+  name: wordpress-stack
+  environment: production

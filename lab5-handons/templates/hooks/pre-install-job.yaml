@@ -1,0 +1,30 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "lab5-handons.fullname" . }}-pre-install
+  labels:
+    {{- include "lab5-handons.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": pre-install
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  template:
+    metadata:
+      name: {{ include "lab5-handons.fullname" . }}-pre-install
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: pre-install
+        image: busybox
+        command:
+          - sh
+          - -c
+          - |
+            echo "===================================="
+            echo "Running pre-install hook"
+            echo "Checking prerequisites..."
+            echo "Environment: {{ .Values.app.environment }}"
+            echo "===================================="
+            sleep 5
+            echo "Pre-install checks completed!"

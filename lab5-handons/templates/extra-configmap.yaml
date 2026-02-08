@@ -1,0 +1,12 @@
+{{- if .Values.extraEnvVars }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "lab5-handons.fullname" . }}-extra-env
+  labels:
+    {{- include "lab5-handons.labels" . | nindent 4 }}
+data:
+  {{- range .Values.extraEnvVars }}
+  {{ .name }}: {{ .value | quote }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,74 @@
+# Lab 5 Advanced Values
+replicaCount: 2
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  tag: "1.21"
+
+service:
+  type: ClusterIP
+  port: 80
+
+resources:
+  limits:
+    cpu: 100m
+    memory: 128Mi
+  requests:
+    cpu: 50m
+    memory: 64Mi
+
+# Custom application configuration
+app:
+  name: advanced-app
+  environment: development
+  logLevel: info
+
+# Database configuration (with conditional)
+database:
+  enabled: false
+  username: admin
+  password: changeme
+  host: postgres
+  port: 5432
+  name: myapp
+
+# Redis configuration
+redis:
+  enabled: false
+  host: redis-master
+  port: 6379
+  password: redispass
+
+# Extra environment variables (for loops)
+extraEnvVars: []
+# Example:
+# extraEnvVars:
+#   - name: API_KEY
+#     value: "12345"
+#   - name: DEBUG_MODE
+#     value: "true"
+
+# Tags (for join function)
+tags:
+  - development
+  - web
+  - frontend
+
+# Functions demo
+functionsDemo:
+  enabled: false
+
+cache:
+  enabled: true
+
+# PostgreSQL dependency configuration
+postgresql:
+  enabled: false
+  auth:
+    username: myapp
+    password: myapppassword
+    database: myappdb
+  primary:
+    persistence:
+      enabled: false

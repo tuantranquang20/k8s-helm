@@ -1,0 +1,76 @@
+{{- define "ecommerce-platform.microservice" -}}
+{{- $service := .service -}}
+{{- $values := .values -}}
+{{- $root := .root -}}
+{{- if $values.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "ecommerce-platform.fullname" $root }}-{{ $service }}
+  labels:
+    {{- include "ecommerce-platform.labels" $root | nindent 4 }}
+    app.kubernetes.io/component: {{ $service }}
+spec:
+  replicas: {{ $values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ecommerce-platform.selectorLabels" $root | nindent 6 }}
+      app.kubernetes.io/component: {{ $service }}
+  template:
+    metadata:
+      labels:
+        {{- include "ecommerce-platform.selectorLabels" $root | nindent 8 }}
+        app.kubernetes.io/component: {{ $service }}
+    spec:
+      containers:
+      - name: {{ $service }}
+        image: "{{ $values.image.repository }}:{{ $values.image.tag }}"
+        imagePullPolicy: {{ $values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: {{ $values.service.port }}
+          protocol: TCP
+        env:
+        {{- range $values.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+        - name: DATABASE_URL
+          value: "postgresql://{{ $root.Values.postgresql.auth.username }}:{{ $root.Values.postgresql.auth.password }}@{{ $root.Release.Name }}-postgresql:5432/{{ $root.Values.postgresql.auth.database }}"
+        - name: REDIS_URL
+          value: "redis://{{ $root.Release.Name }}-redis-master:6379"
+        {{- if $root.Values.rabbitmq.enabled }}
+        - name: RABBITMQ_URL
+          value: "amqp://{{ $root.Values.rabbitmq.auth.username }}:{{ $root.Values.rabbitmq.auth.password }}@{{ $root.Release.Name }}-rabbitmq:5672"
+        {{- end }}
+        resources:
+          {{- toYaml $values.resources | nindent 10 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "ecommerce-platform.fullname" $root }}-{{ $service }}
+  labels:
+    {{- include "ecommerce-platform.labels" $root | nindent 4 }}
+    app.kubernetes.io/component: {{ $service }}
+spec:
+  type: {{ $values.service.type }}
+  ports:
+  - port: {{ $values.service.port }}
+    targetPort: http
+    protocol: TCP
+    name: http
+  selector:
+    {{- include "ecommerce-platform.selectorLabels" $root | nindent 4 }}
+    app.kubernetes.io/component: {{ $service }}
+{{- end }}
+{{- end -}}
+
+{{- include "ecommerce-platform.microservice" (dict "service" "cart" "values" .Values.cart "root" .) }}
+{{- include "ecommerce-platform.microservice" (dict "service" "order" "values" .Values.order "root" .) }}
+{{- include "ecommerce-platform.microservice" (dict "service" "payment" "values" .Values.payment "root" .) }}
+{{- include "ecommerce-platform.microservice" (dict "service" "user" "values" .Values.user "root" .) }}
+{{- if .Values.recommendation.enabled }}
+{{- include "ecommerce-platform.microservice" (dict "service" "recommendation" "values" .Values.recommendation "root" .) }}
+{{- end }}

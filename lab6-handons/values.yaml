@@ -1,0 +1,114 @@
+# Lab 6 - Full-Stack Microservices Application
+# This is a bonus/advanced lab combining all concepts
+
+# Frontend Configuration
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: nginx
+    tag: "1.22"
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 80
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 50m
+      memory: 64Mi
+
+# Backend API Configuration  
+backend:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: nginx  # In real scenario, use your backend image
+    tag: "1.22"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8080
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+  env:
+    - name: NODE_ENV
+      value: "production"
+    - name: PORT
+      value: "8080"
+
+# Database Configuration
+database:
+  enabled: true
+  host: postgres
+  port: 5432
+  name: appdb
+  username: appuser
+  password: changeme123
+
+# Redis Cache Configuration
+redis:
+  enabled: true
+  host: redis-master
+  port: 6379
+  password: redispass
+
+# Ingress Configuration
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  hosts:
+    - host: myapp.example.com
+      paths:
+        - path: /api
+          pathType: Prefix
+          backend: backend
+        - path: /
+          pathType: Prefix
+          backend: frontend
+  tls:
+    - secretName: myapp-tls
+      hosts:
+        - myapp.example.com
+
+# Application Configuration
+app:
+  name: fullstack-app
+  environment: production
+  logLevel: info
+  
+# Monitoring
+monitoring:
+  enabled: false
+  prometheus:
+    enabled: false
+  grafana:
+    enabled: false
+
+# PostgreSQL Dependency
+postgresql:
+  enabled: true
+  auth:
+    username: appuser
+    password: changeme123
+    database: appdb
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+
+# Feature Flags
+features:
+  enableAuth: true
+  enableCache: true
+  enableMetrics: false
+  enableTracing: false

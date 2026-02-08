@@ -1,0 +1,99 @@
+# Voting App Microservices Configuration
+
+# Voting Service (Frontend where users vote)
+vote:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: dockersamples/examplevotingapp_vote
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 80
+    targetPort: 80
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Result Service (Frontend showing voting results)
+result:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: dockersamples/examplevotingapp_result
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 80
+    targetPort: 80
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Worker Service (Processes votes from Redis to PostgreSQL)
+worker:
+  enabled: true
+  replicaCount: 1
+  image:
+    repository: dockersamples/examplevotingapp_worker
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 200m
+      memory: 512Mi
+    requests:
+      cpu: 100m
+      memory: 256Mi
+
+# Redis (Message queue for votes)
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: false
+
+# PostgreSQL (Database for vote results)
+postgresql:
+  enabled: true
+  auth:
+    username: postgres
+    password: postgres
+    database: postgres
+  primary:
+    persistence:
+      enabled: false
+
+# Ingress Configuration
+ingress:
+  enabled: false
+  className: nginx
+  annotations: {}
+  hosts:
+    - host: vote.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: vote
+    - host: result.local
+      paths:
+        - path: /
+          pathType: Prefix
+          service: result
+
+# Application Settings
+app:
+  name: voting-app
+  environment: development

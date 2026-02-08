@@ -1,0 +1,259 @@
+# E-Commerce Platform Configuration
+
+# Frontend Storefront
+frontend:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: nginx
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 80
+  resources:
+    limits:
+      cpu: 300m
+      memory: 256Mi
+    requests:
+      cpu: 150m
+      memory: 128Mi
+
+# Product Catalog Service
+catalog:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: nginx  # Replace with actual catalog service image
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8001
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+  env:
+    - name: SERVICE_NAME
+      value: "catalog-service"
+    - name: PORT
+      value: "8001"
+
+# Shopping Cart Service
+cart:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: nginx  # Replace with actual cart service image
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8002
+  resources:
+    limits:
+      cpu: 300m
+      memory: 384Mi
+    requests:
+      cpu: 150m
+      memory: 192Mi
+  env:
+    - name: SERVICE_NAME
+      value: "cart-service"
+    - name: PORT
+      value: "8002"
+
+# Order Service
+order:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: nginx  # Replace with actual order service image
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8003
+  resources:
+    limits:
+      cpu: 400m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  env:
+    - name: SERVICE_NAME
+      value: "order-service"
+    - name: PORT
+      value: "8003"
+
+# Payment Service (Mock)
+payment:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: nginx  # Replace with actual payment service image
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8004
+  resources:
+    limits:
+      cpu: 300m
+      memory: 256Mi
+    requests:
+      cpu: 150m
+      memory: 128Mi
+  env:
+    - name: SERVICE_NAME
+      value: "payment-service"
+    - name: PORT
+      value: "8004"
+
+# User Service (Authentication & Profiles)
+user:
+  enabled: true
+  replicaCount: 2
+  image:
+    repository: nginx  # Replace with actual user service image
+    tag: "latest"
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8005
+  resources:
+    limits:
+      cpu: 300m
+      memory: 384Mi
+    requests:
+      cpu: 150m
+      memory: 192Mi
+  env:
+    - name: SERVICE_NAME
+      value: "user-service"
+    - name: PORT
+      value: "8005"
+
+# Recommendation Engine (Optional)
+recommendation:
+  enabled: false
+  replicaCount: 1
+  image:
+    repository: nginx
+    tag: "latest"
+  service:
+    type: ClusterIP
+    port: 8006
+  resources:
+    limits:
+      cpu: 500m
+      memory: 1Gi
+    requests:
+      cpu: 250m
+      memory: 512Mi
+
+# PostgreSQL Database
+postgresql:
+  enabled: true
+  auth:
+    username: ecommerce
+    password: ecommerce-password
+    database: ecommerce
+  primary:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      limits:
+        cpu: 1000m
+        memory: 1Gi
+      requests:
+        cpu: 500m
+        memory: 512Mi
+
+# Redis (Session Store & Cache)
+redis:
+  enabled: true
+  auth:
+    enabled: false
+  master:
+    persistence:
+      enabled: true
+      size: 2Gi
+    resources:
+      limits:
+        cpu: 300m
+        memory: 512Mi
+      requests:
+        cpu: 150m
+        memory: 256Mi
+
+# RabbitMQ (Message Queue for Order Processing)
+rabbitmq:
+  enabled: true
+  auth:
+    username: admin
+    password: admin123
+  persistence:
+    enabled: true
+    size: 5Gi
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 250m
+      memory: 256Mi
+
+# Ingress Configuration
+ingress:
+  enabled: false
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
+  hosts:
+    - host: shop.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+        - path: /api/catalog
+          pathType: Prefix
+          service: catalog
+        - path: /api/cart
+          pathType: Prefix
+          service: cart
+        - path: /api/orders
+          pathType: Prefix
+          service: order
+        - path: /api/payment
+          pathType: Prefix
+          service: payment
+        - path: /api/users
+          pathType: Prefix
+          service: user
+  tls:
+    - secretName: shop-tls
+      hosts:
+        - shop.example.com
+
+# Application Settings
+app:
+  name: ecommerce-platform
+  environment: production
+  currency: USD
+  taxRate: 0.08
+
+# Feature Flags
+features:
+  enableRecommendations: false
+  enableReviews: true
+  enableWishlist: true
+  enableCoupons: true
+  enableGuestCheckout: true

@@ -1,0 +1,32 @@
+apiVersion: v2
+name: wordpress-stack
+description: Complete WordPress CMS with MySQL, Redis Cache, and Backups - Lab 9
+type: application
+version: 1.0.0
+appVersion: "6.4"
+
+keywords:
+  - wordpress
+  - cms
+  - mysql
+  - redis
+  - blog
+  - lab9
+
+maintainers:
+  - name: K8s Lab Student
+    email: student@k8s-lab.local
+
+dependencies:
+  - name: wordpress
+    version: "19.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: wordpress.enabled
+  - name: mysql
+    version: "9.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: mysql.enabled
+  - name: redis
+    version: "17.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled

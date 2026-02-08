@@ -1,0 +1,117 @@
+# Monitoring Stack Configuration
+
+# Enable Prometheus Stack
+prometheus:
+  enabled: true
+
+# Kube-Prometheus-Stack Configuration
+kube-prometheus-stack:
+  # Prometheus Configuration
+  prometheus:
+    enabled: true
+    prometheusSpec:
+      retention: 10d
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: ["ReadWriteOnce"]
+            resources:
+              requests:
+                storage: 10Gi
+      resources:
+        limits:
+          cpu: 1000m
+          memory: 2Gi
+        requests:
+          cpu: 500m
+          memory: 1Gi
+    service:
+      type: LoadBalancer
+      port: 9090
+
+  # Grafana Configuration
+  grafana:
+    enabled: true
+    adminPassword: "admin123"
+    service:
+      type: LoadBalancer
+      port: 80
+    persistence:
+      enabled: true
+      size: 5Gi
+    dashboardProviders:
+      dashboardproviders.yaml:
+        apiVersion: 1
+        providers:
+        - name: 'default'
+          orgId: 1
+          folder: ''
+          type: file
+          disableDeletion: false
+          editable: true
+          options:
+            path: /var/lib/grafana/dashboards/default
+    dashboards:
+      default:
+        kubernetes-cluster:
+          gnetId: 7249
+          revision: 1
+          datasource: Prometheus
+        node-exporter:
+          gnetId: 1860
+          revision: 27
+          datasource: Prometheus
+        pods:
+          gnetId: 6417
+          revision: 1
+          datasource: Prometheus
+
+  # Alert Manager Configuration
+  alertmanager:
+    enabled: true
+    config:
+      global:
+        resolve_timeout: 5m
+      route:
+        group_by: ['alertname', 'cluster']
+        group_wait: 10s
+        group_interval: 10s
+        repeat_interval: 12h
+        receiver: 'null'
+        routes:
+        - match:
+            alertname: Watchdog
+          receiver: 'null'
+      receivers:
+      - name: 'null'
+    service:
+      type: LoadBalancer
+      port: 9093
+
+  # Node Exporter
+  nodeExporter:
+    enabled: true
+
+  # Kube State Metrics
+  kubeStateMetrics:
+    enabled: true
+
+  # Prometheus Operator
+  prometheusOperator:
+    enabled: true
+
+# Custom Application Monitoring
+app:
+  name: monitoring-stack
+  environment: production
+
+# Sample Application for Monitoring (Optional)
+sampleApp:
+  enabled: true
+  replicaCount: 3
+  image:
+    repository: nginx
+    tag: "latest"
+  monitoring:
+    enabled: true
+    port: 9113

@@ -69,19 +69,119 @@ k8s-helm/
 ├── k8s-helm-theory.md            # Theory guide
 ├── k8s-helm-labs.md              # Lab guide
 ├── lab1/                          # Lab 1 files
+│   ├── README.md
 │   ├── nginx-pod.yaml
 │   └── nginx-deployment.yaml
 ├── lab2/                          # Lab 2 files
+│   ├── README.md
 │   ├── web-deployment.yaml
 │   └── web-service.yaml
 ├── lab3/                          # Lab 3 files
+│   ├── README.md
 │   └── custom-nginx-values.yaml
 ├── lab4/                          # Lab 4 files
-│   └── myapp/                     # Your custom chart
-└── lab5/                          # Lab 5 files
-    └── advanced-chart/
+│   ├── README.md
+│   ├── INSTRUCTIONS.md
+│   └── myapp-production.yaml
+├── lab5/                          # Lab 5 files
+│   ├── README.md
+│   ├── INSTRUCTIONS.md
+│   ├── extra-env-values.yaml
+│   └── complete-values.yaml
+│
+├── lab4-handons/                  # 🎯 READY-TO-USE HELM CHART
+│   ├── Chart.yaml
+│   ├── README.md
+│   ├── values.yaml
+│   ├── production-values.yaml
+│   └── templates/
+│       ├── configmap.yaml         # Custom ConfigMap
+│       └── deployment.yaml        # Modified with env vars
+│
+├── lab5-handons/                  # 🎯 READY-TO-USE ADVANCED CHART
+│   ├── Chart.yaml                 # With dependencies
+│   ├── README.md
+│   ├── values.yaml
+│   └── templates/
+│       ├── secret.yaml            # Conditional Secret
+│       ├── extra-configmap.yaml   # With loops
+│       ├── functions-demo.yaml    # Template functions
+│       ├── connection-config.yaml # Custom helpers
+│       ├── hooks/                 # Pre/post install
+│       └── tests/                 # Chart tests
+│
+└── lab6-handons/                  # 🎯 READY-TO-use FULL-STACK APP
+    ├── Chart.yaml                 # With PostgreSQL & Redis  
+    ├── README.md
+    ├── values.yaml
+    └── templates/
+        ├── frontend-deployment.yaml
+        ├── backend-deployment.yaml
+        ├── service.yaml           # Multi-service
+        ├── ingress.yaml           # Path-based routing
+        └── secret.yaml            # Database credentials
 ```
 
+## 🎯 Hands-On Labs (Ready to Use!)
+
+Three complete, ready-to-use Helm charts have been created for you:
+
+### **lab4-handons** - Custom Helm Charts
+Complete chart demonstrating:
+- Custom ConfigMaps
+- Environment variables from ConfigMaps
+- Multiple environment configurations (dev/prod)
+
+**Quick start:**
+```bash
+cd lab4-handons
+helm lint .
+helm template myapp .
+helm install myapp-dev .
+```
+
+### **lab5-handons** - Advanced Helm Features
+Advanced chart with:
+- Conditionals (if/else)
+- Loops (range)
+- Template functions
+- Custom helpers
+- Chart dependencies (PostgreSQL, Redis)
+- Helm hooks
+- Chart tests
+
+**Quick start:**
+```bash
+cd lab5-handons
+helm dependency update
+helm template test . --set database.enabled=true
+helm install advanced .
+helm test advanced
+```
+
+### **lab6-handons** - Full-Stack Microservices (BONUS)
+Production-ready full-stack application:
+- Frontend service (nginx)
+- Backend API service
+- PostgreSQL database
+- Redis cache
+- Advanced Ingress routing
+- Multi-component architecture
+
+**Quick start:**
+```bash
+cd lab6-handons
+helm dependency update
+helm install fullstack . --set postgresql.enabled=true
+kubectl get all
+```
+
+Each lab folder contains a comprehensive README with:
+- What's included
+- Quick start commands
+- Configuration options
+- Exercises
+- Troubleshooting tips
 ## ⚡ Quick Commands Reference
 
 ### Kubernetes

@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "lab4-handons.fullname" . }}-config
+  labels:
+    {{- include "lab4-handons.labels" . | nindent 4 }}
+data:
+  app.name: {{ .Values.app.name | quote }}
+  app.environment: {{ .Values.app.environment | quote }}
+  log.level: {{ .Values.app.logLevel | quote }}
