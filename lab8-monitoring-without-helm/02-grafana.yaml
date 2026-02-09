@@ -1,0 +1,108 @@
+# Grafana ConfigMap for datasource
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+  labels:
+    app: monitoring
+    component: grafana
+data:
+  datasources.yaml: |
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        access: proxy
+        url: http://prometheus:9090
+        isDefault: true
+        editable: true
+---
+# Grafana Secret
+apiVersion: v1
+kind: Secret
+metadata:
+  name: grafana-secret
+  namespace: monitoring
+type: Opaque
+data:
+  admin-user: YWRtaW4=  # admin
+  admin-password: YWRtaW4xMjM=  # admin123
+---
+# Grafana Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app: monitoring
+    component: grafana
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: monitoring
+      component: grafana
+  template:
+    metadata:
+      labels:
+        app: monitoring
+        component: grafana
+    spec:
+      containers:
+      - name: grafana
+        image: grafana/grafana:10.0.0
+        ports:
+        - containerPort: 3000
+          name: http
+        env:
+        - name: GF_SECURITY_ADMIN_USER
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secret
+              key: admin-user
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: grafana-secret
+              key: admin-password
+        - name: GF_INSTALL_PLUGINS
+          value: ""
+        volumeMounts:
+        - name: datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: storage
+          mountPath: /var/lib/grafana
+        resources:
+          limits:
+            cpu: 500m
+            memory: 512Mi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+      volumes:
+      - name: datasources
+        configMap:
+          name: grafana-datasources
+      - name: storage
+        emptyDir: {}
+---
+# Grafana Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana
+  namespace: monitoring
+  labels:
+    app: monitoring
+    component: grafana
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: http
+    name: http
+  selector:
+    app: monitoring
+    component: grafana

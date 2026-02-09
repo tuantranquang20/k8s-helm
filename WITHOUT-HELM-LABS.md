@@ -9,7 +9,24 @@ These labs demonstrate the **SAME applications** from Labs 5-10, but deployed us
 - ✅ The complexity Helm abstracts away
 - ✅ **Why Helm is valuable** for real-world deployments
 
-## 📚 Available Labs
+## 📚 Available Labs - ALL COMPLETE! 🎉
+
+### ✅ Lab 4: Custom Charts - WITHOUT Helm
+**Folder**: `lab4-handons-without-helm/`
+
+**What it shows**:
+- Multi-environment deployments
+- Massive code duplication (90% identical!)
+- Dev vs Prod = 2 complete deployments
+- No template reuse
+
+**Files**: 4 YAML files (~150 lines) vs. Helm's 1 template + 2 value files
+
+**Complexity**: ⭐⭐ Manageable but duplicated
+
+**Key Lesson**: Multi-environment = duplication nightmare!
+
+---
 
 ### ✅ Lab 5: Advanced Features - WITHOUT Helm
 **Folder**: `lab5-handons-without-helm/`
@@ -20,7 +37,24 @@ These labs demonstrate the **SAME applications** from Labs 5-10, but deployed us
 - Multiple ConfigMaps instead of single values file
 - Manual secret management (base64 encoding)
 
-**Files**: 5 YAML files vs. Helm's dynamic templates
+**Files**: 5 YAML files (~150 lines) vs. Helm's dynamic templates
+
+**Complexity**: ⭐⭐ Manageable
+
+---
+
+### ✅ Lab 6: Full-Stack App - WITHOUT Helm
+**Folder**: `lab6-handons-without-helm/`
+
+**What it shows**:
+- Frontend + Backend + PostgreSQL
+- Credentials in 3 places
+- Manual service coordination
+- No dependency management
+
+**Files**: 4 YAML files (~180 lines) vs. Helm's managed stack
+
+**Complexity**: ⭐⭐ Moderate
 
 ---
 
@@ -35,21 +69,58 @@ These labs demonstrate the **SAME applications** from Labs 5-10, but deployed us
 
 **Files**: 6 YAML files (~250 lines) vs. Helm's managed dependencies
 
+**Complexity**: ⭐⭐⭐⭐ Getting Painful
+
 ---
 
-### ⏳ Coming Soon
+### ✅ Lab 8: Monitoring Stack - WITHOUT Helm 💀
+**Folder**: `lab8-monitoring-without-helm/`
 
-#### Lab 6: Full-Stack - WITHOUT Helm
-**Complexity**: Medium
+**What it shows**:
+- Manual Prometheus + Grafana (only!)
+- NO AlertManager (missing!)
+- NO Node Exporter (missing!)
+- NO Kube State Metrics (missing!)
+- NO pre-built dashboards
+- Complex RBAC configuration
+- Manual scrape configs
 
-#### Lab 8: Monitoring Stack - WITHOUT Helm
-**Complexity**: Very High (Prometheus, Grafana, AlertManager manually)
+**Files**: 3 YAML files (~300 lines) vs. Helm's complete 30+ component stack
 
-#### Lab 9: WordPress - WITHOUT Helm
-**Complexity**: Medium (WordPress + MySQL + Redis)
+**Complexity**: ⭐⭐⭐⭐⭐ EXTREME PAIN
 
-#### Lab 10: E-Commerce - WITHOUT Helm
-**Complexity**: Extreme (9 microservices, all manually coordinated)
+---
+
+### ✅ Lab 9: WordPress CMS - WITHOUT Helm
+**Folder**: `lab9-wordpress-without-helm/`
+
+**What it shows**:
+- WordPress + MySQL deployment
+- Manual PVC creation (2 PVCs)
+- Base64 secret encoding
+- No plugin management
+- No backup automation
+
+**Files**: 3 YAML files (~200 lines) vs. Helm's Bitnami chart
+
+**Complexity**: ⭐⭐⭐ Moderate but tedious
+
+---
+
+### ✅ Lab 10: E-Commerce Platform - WITHOUT Helm 😱
+**Folder**: `lab10-ecommerce-without-helm/`
+
+**What it shows**:
+- 9 microservices (Frontend, Catalog, Cart, Order, Payment, User)
+- PostgreSQL + Redis + RabbitMQ
+- Credentials in 10+ places
+- Service names hard-coded everywhere
+- Connection strings manually constructed
+- Deployment order critical
+
+**Files**: 7 YAML files (~800+ lines) vs. Helm's 1-command deployment
+
+**Complexity**: ⭐⭐⭐⭐⭐ NIGHTMARE MODE
 
 ---
 
@@ -254,13 +325,26 @@ These labs prove that **Helm isn't just a convenience—it's essential** for:
 
 ---
 
-## 📊 Quick Stats
+## 📊 Quick Stats - FINAL RESULTS
 
-| Lab | Helm Files | Raw YAML Files | Lines of Code (Helm) | Lines of Code (Raw) | Complexity Increase |
-|-----|------------|----------------|----------------------|---------------------|---------------------|
-| Lab 5 | 1 values + 4 templates | 5 files | ~100 | ~150 | +50% |
-| Lab 7 | 1 values + deps | 6 files | ~120 | ~250 | +108% |
-| Lab 10 | 1 values + deps | 15+ files | ~150 | ~800+ | +433%! |
+| Lab | Helm Files | Raw YAML Files | Lines (Helm) | Lines (Raw) | Complexity Increase | Pain Level |
+|-----|------------|----------------|--------------|-------------|---------------------|-----------|
+| **Lab 4** | 1 values + 2 files + templates | 4 files | ~100 | ~150 | +50% | 😐 Manageable but duplicated |
+| **Lab 5** | 1 values + 4 templates | 5 files | ~100 | ~150 | +50% | 😐 Manageable |
+| **Lab 6** | 1 values + 3 templates | 4 files | ~120 | ~180 | +50% | 😐 Manageable |
+| **Lab 7** | 1 values + deps | 6 files | ~120 | ~250 | +108% | 😬 Getting tedious |
+| **Lab 8** | 1 values + deps | 3 files* | ~150 | ~300* | +100%* | 😱 **EXTREME PAIN** |
+| **Lab 9** | 1 values + deps | 3 files | ~130 | ~200 | +54% | 😤 Tedious |
+| **Lab 10** | 1 values + deps | 7 files | ~150 | ~800+ | **+433%!** | 💀 **NIGHTMARE** |
+
+\* Lab 8 without Helm is **incomplete** - missing AlertManager, Node Exporter, Kube State Metrics, dashboards, alerts!
+
+**Key Findings:**
+- **Lab 4**: Shows multi-environment duplication (dev vs prod = 90% duplicate code)
+- **Complexity grows exponentially** as services increase
+- **Helm's value increases** with application complexity
+- **Lab 8 & 10 are virtually impossible** to maintain without Helm
+- **Production deployments** absolutely need Helm
 
 **Takeaway**: As complexity grows, Helm's value increases exponentially!
 
